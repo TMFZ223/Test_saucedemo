@@ -2,12 +2,87 @@ using System;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Support.UI;
+using SeleniumExtras.WaitHelpers;
 using Xunit;
 
 public class TestSaucedemo
 {
-    [Fact]
-    // Тест на авторизацию
+    // РњРµС‚РѕРґ Р°РІС‚РѕСЂРёР·Р°С†РёРё
+    private void authorize(IWebDriver driver)
+    {
+        // РќР°С…РѕРґРёРј РїРѕР»СЏ Р°РІС‚РѕСЂРёР·Р°С†РёРё
+        var login = driver.FindElement(By.XPath("//input[@placeholder='Username']"));
+        var password = driver.FindElement(By.XPath("//input[@placeholder='Password']"));
+        // Р—Р°РїРѕР»РЅСЏРµРј РїРѕР»СЏ Р°РІС‚РѕСЂРёР·Р°С†РёРё
+        login.SendKeys("standard_user");
+        password.SendKeys("secret_sauce");
+        // РЅР°С…РѕРґРёРј РєРЅРѕРїРєСѓ РІС…РѕРґР°
+        var loginButton = driver.FindElement(By.XPath("//input[@value='Login']"));
+        // РљР»РёРєР°РµРј РїРѕ РєРЅРѕРїРєРµ РІС…РѕРґР°
+        loginButton.Click();
+    }
+    // РњРµС‚РѕРґ РґР»СЏ РґРѕР±Р°РІР»РµРЅРёСЏ С‚РѕРІР°СЂР° РІ РєРѕСЂР·РёРЅСѓ
+    private void addProductToCart(IWebDriver driver)
+    {
+        WebDriverWait wait = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
+        // РќР°С…РѕРґРёРј СЃСЃС‹Р»РєСѓ СЃ Р»СЋР±С‹Рј С‚РѕРІР°СЂРѕРј
+        var product = wait.Until(ExpectedConditions.ElementIsVisible(By.XPath("//img[@alt ='Sauce Labs Backpack']")));
+        // РџРµСЂРµС…РѕРґРёРј РїРѕ СЃСЃС‹Р»РєРµ С‚РѕРІР°СЂР°
+        product.Click();
+        // РќР°С…РѕРґРёРј РєРЅРѕРїРєСѓ РґРѕР±Р°РІР»РµРЅРёСЏ С‚РѕРІР°СЂР° РІ РєРѕСЂР·РёРЅСѓ
+        var cartButton = wait.Until(ExpectedConditions.ElementToBeClickable(By.XPath("//button[@name = 'add-to-cart']")));
+        cartButton.Click();
+        // РќР°С…РѕРґРёРј СЃСЃС‹Р»РєСѓ СЃ РєРѕСЂР·РёРЅРѕР№, РІ РєРѕС‚РѕСЂСѓСЋ Р±С‹Р» РґРѕР±Р°РІР»РµРЅ 1 С‚РѕРІР°СЂ
+        var cartLink = wait.Until(ExpectedConditions.ElementToBeClickable(By.XPath("//a[@class='shopping_cart_link']")));
+        // РџРµСЂРµС…РѕРґРёРј РїРѕ СЌС‚РѕР№ СЃСЃС‹Р»РєРµ
+        cartLink.Click();
+    }
+    private void continueShopping(IWebDriver driver)
+    {
+        // РџСЂРµРґРїРѕР»РѕР¶РёРј, С‡С‚Рѕ РјС‹ С…РѕС‚РёРј РґРѕР±Р°РІРёС‚СЊ РµС‰С‘ 1 С‚РѕРІР°СЂ, РїРѕСЌС‚РѕРјСѓ РІРѕР·РІСЂР°С‰Р°РµРјСЃСЏ РЅР° СЃС‚СЂР°РЅРёС†Сѓ С‚РѕРІР°СЂРѕРІ
+        WebDriverWait wait = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
+        var goBack = wait.Until(ExpectedConditions.ElementToBeClickable(By.XPath("//button[@name = 'continue-shopping']")));
+        goBack.Click();
+        // РџРµСЂРµС…РѕРґРёРј РїРѕ СЃСЃС‹Р»РєРµ РґСЂСѓРіРѕРіРѕ С‚РѕРІР°СЂР° Рё РґРѕР±Р°РІР»СЏРµРј РµРіРѕ РІ РєРѕСЂР·РёРЅСѓ
+        var oneMoreProduct = wait.Until(ExpectedConditions.ElementIsVisible(By.XPath("//img[@alt ='Sauce Labs Fleece Jacket']")));
+        oneMoreProduct.Click();
+        var oneMoreCartButton = wait.Until(ExpectedConditions.ElementToBeClickable(By.XPath("//button[@name = 'add-to-cart']")));
+        oneMoreCartButton.Click();
+    }
+    // РњРµС‚РѕРґ Р·Р°РєР°Р·Р° С‚РѕРІР°СЂР°
+    private void doOrder(IWebDriver driver)
+    {
+        WebDriverWait wait = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
+        // РќР°С…РѕРґРёРј СЃСЃС‹Р»РєСѓ СЃ Р»СЋР±С‹Рј С‚РѕРІР°СЂРѕРј
+        var product = wait.Until(ExpectedConditions.ElementIsVisible(By.XPath("//img[@alt ='Sauce Labs Fleece Jacket']")));
+        // РџРµСЂРµС…РѕРґРёРј РїРѕ СЃСЃС‹Р»РєРµ С‚РѕРІР°СЂР°
+        product.Click();
+        // РќР°С…РѕРґРёРј РєРЅРѕРїРєСѓ РґРѕР±Р°РІР»РµРЅРёСЏ С‚РѕРІР°СЂР° РІ РєРѕСЂР·РёРЅСѓ Рё РґРѕР±Р°РІР»СЏРµРј С‚РѕРІР°СЂ РІ РєРѕСЂР·РёРЅСѓ
+        var cartButton = wait.Until(ExpectedConditions.ElementToBeClickable(By.XPath("//button[@name = 'add-to-cart']")));
+        cartButton.Click();
+        // РџРµСЂРµС…РѕРґРёРј РІ РєРѕСЂР·РёРЅСѓ С‚РѕРІР°СЂРѕРІ
+        var cartLink = wait.Until(ExpectedConditions.ElementToBeClickable(By.XPath("//a[@class='shopping_cart_link']")));
+        cartLink.Click();
+        // РќР°С…РѕРґРёРј РєРЅРѕРїРєСѓ Р·Р°РєР°Р·Р° Рё РЅР°Р¶РёРјР°РµРј РЅР° РЅРµС‘
+        var checkOut = wait.Until(ExpectedConditions.ElementToBeClickable(By.XPath("//button[@name = 'checkout']")));
+        checkOut.Click();
+        // РќР°С…РѕРґРёРј Рё Р·Р°РїРѕР»РЅСЏРµРј РїРѕР»СЏ РґР»СЏ Р·Р°РєР°Р·Р°
+        var yourFirstName = wait.Until(ExpectedConditions.ElementIsVisible(By.XPath("//input[@placeholder='First Name']")));
+        var yourLastName = driver.FindElement(By.XPath("//input[@placeholder='Last Name']"));
+        var yourZipPostalCod = driver.FindElement(By.XPath("//input[@placeholder='Zip/Postal Code']"));
+        yourFirstName.SendKeys("Test name");
+        yourLastName.SendKeys("Test lastname");
+        yourZipPostalCod.SendKeys("324687");
+        // РќР°С…РѕРґРёРј РєРЅРѕРїРєСѓ РґР»СЏ РѕС‚РїСЂР°РІРєРё РёРЅС„РѕСЂРјР°С†РёРё Рё РїРµСЂРµС…РѕРґР° РЅР° СЃС‚СЂР°РЅРёС†Сѓ РїРѕРґС‚РІРµСЂР¶РґРµРЅРёСЏ Р·Р°РєР°Р·Р°
+        var nextButton = wait.Until(ExpectedConditions.ElementToBeClickable(By.XPath("//input[@type='submit']")));
+        // РљР»РёРєР°РµРј РїРѕ РєРЅРѕРїРєРµ
+        nextButton.Click();
+        // РќР°С…РѕРґРёРј РєРЅРѕРїРєСѓ Р·Р°РІРµСЂС€РµРЅРёСЏ Р·Р°РєР°Р·Р° Рё РїСЂРѕРёР·РІРѕРґРёРј РєР»РёРє РїРѕ РЅРµР№
+        var finishButton = wait.Until(ExpectedConditions.ElementToBeClickable(By.XPath("//button[@name='finish']")));
+        finishButton.Click();
+    }
+        [Fact]
+    // РўРµСЃС‚ РЅР° Р°РІС‚РѕСЂРёР·Р°С†РёСЋ
     public void TestCheckAuthorization()
     {
         string url = "https://www.saucedemo.com/";
@@ -15,189 +90,107 @@ public class TestSaucedemo
         using (IWebDriver driver = new ChromeDriver())
         {
             driver.Navigate().GoToUrl(url);
-
-            // Находим поля авторизации
-            var login = driver.FindElement(By.XPath("//input[@placeholder='Username']"));
-            var password = driver.FindElement(By.XPath("//input[@placeholder='Password']"));
-            // Заполняем поля авторизации
-            login.SendKeys("standard_user");
-            password.SendKeys("secret_sauce");
-            // находим кнопку входа
-            var loginButton = driver.FindElement(By.XPath("//input[@value='Login']"));
-            // Кликаем по кнопке входа
-            loginButton.Click();
-            string expectedResult = "https://www.saucedemo.com/inventory.html"; // Ожидаемый адрес перехода после авторизации
-            var actualResult = driver.Url; // Фактический результат
+            // Р’С‹РїРѕР»РЅСЏРµРј Р°РІС‚РѕСЂРёР·Р°С†РёСЋ
+            authorize(driver);
+            string expectedResult = "https://www.saucedemo.com/inventory.html"; // РћР¶РёРґР°РµРјС‹Р№ Р°РґСЂРµСЃ РїРµСЂРµС…РѕРґР° РїРѕСЃР»Рµ Р°РІС‚РѕСЂРёР·Р°С†РёРё
+            var actualResult = driver.Url; // Р¤Р°РєС‚РёС‡РµСЃРєРёР№ СЂРµР·СѓР»СЊС‚Р°С‚
             Assert.Equal(expectedResult, actualResult);
         }
     }
     [Fact]
-    // Тест на добавление товаров в корзину
+    // РўРµСЃС‚ РЅР° РґРѕР±Р°РІР»РµРЅРёРµ С‚РѕРІР°СЂРѕРІ РІ РєРѕСЂР·РёРЅСѓ
     public void TestCheckAddProductCart()
     {
         string url = "https://www.saucedemo.com/";
 
-        using (IWebDriver driver = new ChromeDriver()) // Создание экземпляра Chromedriver
+        using (IWebDriver driver = new ChromeDriver()) // РЎРѕР·РґР°РЅРёРµ СЌРєР·РµРјРїР»СЏСЂР° Chromedriver
         {
 
             driver.Navigate().GoToUrl(url);
 
-            // Находим поля авторизации
-            var login = driver.FindElement(By.XPath("//input[@placeholder='Username']"));
-            var password = driver.FindElement(By.XPath("//input[@placeholder='Password']"));
-            // Заполняем поля авторизации
-            login.SendKeys("standard_user");
-            password.SendKeys("secret_sauce");
-            // находим кнопку входа
-            var loginButton = driver.FindElement(By.XPath("//input[@value='Login']"));
-            // Кликаем по кнопке входа
-            loginButton.Click();
-
-            // Находим ссылку с любым товаром
-            var product = driver.FindElement(By.XPath("//img[@alt ='Sauce Labs Backpack']"));
-            // Переходим по ссылке товара
-            product.Click();
-            // Находим кнопку добавления товара в корзину
-            var cartButton = driver.FindElement(By.XPath("//button[@name = 'add-to-cart']"));
-            cartButton.Click();
-            // Находим ссылку с корзиной, в которую был добавлен 1 товар
-            var cartLink = driver.FindElement(By.XPath("//a[@class='shopping_cart_link']"));
-            // Переходим по этой ссылке
-            cartLink.Click();
-            string expectedResult = "Sauce Labs Backpack"; // В корзине доступен товар для заказа
-            var actualProduct = driver.FindElement(By.XPath("//div[@class='inventory_item_name']"));
+            // Р’С‹РїРѕР»РЅСЏРµРј Р°РІС‚РѕСЂРёР·Р°С†РёСЋ
+            authorize(driver);
+            // РћСЃСѓС‰РµСЃС‚РІР»СЏРµРј РґРѕР±Р°РІР»РµРЅРёРµ С‚РѕРІР°СЂР° РІ РєРѕСЂР·РёРЅСѓ
+            addProductToCart(driver);
+            string expectedResult = "Sauce Labs Backpack"; // Р’ РєРѕСЂР·РёРЅРµ РґРѕСЃС‚СѓРїРµРЅ С‚РѕРІР°СЂ РґР»СЏ Р·Р°РєР°Р·Р°
+            WebDriverWait wait = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
+            var actualProduct = wait.Until(ExpectedConditions.ElementIsVisible(By.XPath("//div[@class='inventory_item_name']")));
             string actualResult = actualProduct.Text;
             Assert.Equal(expectedResult, actualResult);
         }
     }
     [Fact]
-    // Тест на редактирование заказа
+    // РўРµСЃС‚ РЅР° СЂРµРґР°РєС‚РёСЂРѕРІР°РЅРёРµ Р·Р°РєР°Р·Р°
     public void TestCheckEditProductCart()
     {
         string url = "https://www.saucedemo.com/";
 
-        using (IWebDriver driver = new ChromeDriver()) // Создание экземпляра Chromedriver
+        using (IWebDriver driver = new ChromeDriver()) // РЎРѕР·РґР°РЅРёРµ СЌРєР·РµРјРїР»СЏСЂР° Chromedriver
         {
 
             driver.Navigate().GoToUrl(url);
 
-            // Находим поля авторизации
-            var login = driver.FindElement(By.XPath("//input[@placeholder='Username']"));
-            var password = driver.FindElement(By.XPath("//input[@placeholder='Password']"));
-            // Заполняем поля авторизации
-            login.SendKeys("standard_user");
-            password.SendKeys("secret_sauce");
-            // находим кнопку входа
-            var loginButton = driver.FindElement(By.XPath("//input[@value='Login']"));
-            // Кликаем по кнопке входа
-            loginButton.Click();
-
-            // Находим ссылку с любым товаром
-            var product = driver.FindElement(By.XPath("//img[@alt ='Sauce Labs Backpack']"));
-            // Переходим по ссылке товара
-            product.Click();
-            // Находим кнопку добавления товара в корзину
-            var cartButton = driver.FindElement(By.XPath("//button[@name = 'add-to-cart']"));
-            cartButton.Click();
-            // Находим ссылку с корзиной, в которую был добавлен 1 товар
-            var cartLink = driver.FindElement(By.XPath("//a[@class='shopping_cart_link']"));
-            // Переходим по этой ссылке
-            cartLink.Click();
-            // Предположим, что мы хотим добавить ещё 1 товар, поэтому возвращаемся на страницу товаров
-            var goBack = driver.FindElement(By.XPath("//button[@name = 'continue-shopping']"));
-            goBack.Click();
-            // Переходим по ссылке другого товара и добавляем его в корзину
-            var oneMoreProduct = driver.FindElement(By.XPath("//img[@alt ='Sauce Labs Fleece Jacket']"));
-            oneMoreProduct.Click();
-            var oneMoreCartButton = driver.FindElement(By.XPath("//button[@name = 'add-to-cart']"));
-            oneMoreCartButton.Click();
-            string expectedResult = "2"; // В корзине 2 товара
-            var actualCart = driver.FindElement(By.XPath("//span[@class='shopping_cart_badge']"));
+            // Р’С‹РїРѕР»РЅСЏРµРј Р°РІС‚РѕСЂРёР·Р°С†РёСЋ
+            authorize(driver);
+            // РћСЃСѓС‰РµСЃС‚РІР»СЏРµРј РґРѕР±Р°РІР»РµРЅРёРµ С‚РѕРІР°СЂР° РІ РєРѕСЂР·РёРЅСѓ
+            addProductToCart(driver);
+            // РџСЂРѕРґРѕР»Р¶Р°РµРј РїРѕРєСѓРїРєСѓ
+            continueShopping(driver);
+            string expectedResult = "2"; // Р’ РєРѕСЂР·РёРЅРµ 2 С‚РѕРІР°СЂР°
+            WebDriverWait wait = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
+            var actualCart = wait.Until(ExpectedConditions.ElementIsVisible(By.XPath("//span[@class='shopping_cart_badge']")));
             string actualResult = actualCart.Text;
             Assert.Equal(expectedResult, actualResult);
         }
     }
     [Fact]
-    // Тест на заказ товара
+    // РўРµСЃС‚ РЅР° Р·Р°РєР°Р· С‚РѕРІР°СЂР°
     public void TestCheckOrderProduct()
     {
         string url = "https://www.saucedemo.com/";
 
-        using (IWebDriver driver = new ChromeDriver()) // Создание экземпляра Chromedriver
+        using (IWebDriver driver = new ChromeDriver()) // РЎРѕР·РґР°РЅРёРµ СЌРєР·РµРјРїР»СЏСЂР° Chromedriver
         {
 
             driver.Navigate().GoToUrl(url);
 
-            // Находим поля авторизации
-            var login = driver.FindElement(By.XPath("//input[@placeholder='Username']"));
-            var password = driver.FindElement(By.XPath("//input[@placeholder='Password']"));
-            // Заполняем поля авторизации
-            login.SendKeys("standard_user");
-            password.SendKeys("secret_sauce");
-            // находим кнопку входа
-            var loginButton = driver.FindElement(By.XPath("//input[@value='Login']"));
-            // Кликаем по кнопке входа
-            loginButton.Click();
-
-            // Находим ссылку с любым товаром
-            var product = driver.FindElement(By.XPath("//img[@alt ='Sauce Labs Fleece Jacket']"));
-            // Переходим по ссылке товара
-            product.Click();
-            // Находим кнопку добавления товара в корзину и добавляем товар в корзину
-            var cartButton = driver.FindElement(By.XPath("//button[@name = 'add-to-cart']"));
-            cartButton.Click();
-            // Переходим в корзину товаров
-            var cartLink = driver.FindElement(By.XPath("//a[@class='shopping_cart_link']"));
-            cartLink.Click();
-            // Находим кнопку заказа и нажимаем на неё
-            var checkOut = driver.FindElement(By.XPath("//button[@name = 'checkout']"));
-            checkOut.Click();
-            // Находим и заполняем поля для заказа
-            var yourFirstName = driver.FindElement(By.XPath("//input[@placeholder='First Name']"));
-            var yourLastName = driver.FindElement(By.XPath("//input[@placeholder='Last Name']"));
-            var yourZipPostalCod = driver.FindElement(By.XPath("//input[@placeholder='Zip/Postal Code']"));
-            yourFirstName.SendKeys("Test name");
-            yourLastName.SendKeys("Test lastname");
-            yourZipPostalCod.SendKeys("324687");
-            // Находим кнопку для отправки информации и перехода на страницу подтверждения заказа
-            var nextButton = driver.FindElement(By.XPath("//input[@type='submit']"));
-            // Кликаем по кнопке
-            nextButton.Click();
-            // Находим кнопку завершения заказа и производим клик по ней
-            var finishButton = driver.FindElement(By.XPath("//button[@name='finish']"));
-            finishButton.Click();
+            // Р’С‹РїРѕР»РЅСЏРµРј Р°РІС‚РѕСЂРёР·Р°С†РёСЋ
+            authorize(driver);
+            // Р’С‹РїРѕР»РЅСЏРµРј Р·Р°РєР°Р· С‚РѕРІР°СЂР°
+            doOrder(driver);
             string expectedResult = "Thank you for your order!";
-            var actualHeder = driver.FindElement(By.XPath("//h2[@class='complete-header']"));
+            WebDriverWait wait = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
+            var actualHeder = wait.Until(ExpectedConditions.ElementIsVisible(By.XPath("//h2[@class='complete-header']")));
             string actualResult = actualHeder.Text;
             Assert.Equal(expectedResult, actualResult);
         }
     }
-    // Ниже будут приведены тесты на доступность элементов для программ экранного доступа, в качестве образца взята страница авторизации
+    // РќРёР¶Рµ Р±СѓРґСѓС‚ РїСЂРёРІРµРґРµРЅС‹ С‚РµСЃС‚С‹ РЅР° РґРѕСЃС‚СѓРїРЅРѕСЃС‚СЊ СЌР»РµРјРµРЅС‚РѕРІ РґР»СЏ РїСЂРѕРіСЂР°РјРј СЌРєСЂР°РЅРЅРѕРіРѕ РґРѕСЃС‚СѓРїР°, РІ РєР°С‡РµСЃС‚РІРµ РѕР±СЂР°Р·С†Р° РІР·СЏС‚Р° СЃС‚СЂР°РЅРёС†Р° Р°РІС‚РѕСЂРёР·Р°С†РёРё
     [Fact]
-    // Проверка количества заголовков, доступных для просмотра с помощью скрин ридеров
+    // РџСЂРѕРІРµСЂРєР° РєРѕР»РёС‡РµСЃС‚РІР° Р·Р°РіРѕР»РѕРІРєРѕРІ, РґРѕСЃС‚СѓРїРЅС‹С… РґР»СЏ РїСЂРѕСЃРјРѕС‚СЂР° СЃ РїРѕРјРѕС‰СЊСЋ СЃРєСЂРёРЅ СЂРёРґРµСЂРѕРІ
     public void TestCheckQuantityHeadersOnThisPage()
     {
         string url = "https://www.saucedemo.com/";
         using (IWebDriver driver = new ChromeDriver())
         {
             driver.Navigate().GoToUrl(url);
-            int expectedResult = 2; // 2 заголовка, доступно для просмотра с помощью скрин ридера
-            // Проверяем, сколько всего заголовков
+            int expectedResult = 2; // 2 Р·Р°РіРѕР»РѕРІРєР°, РґРѕСЃС‚СѓРїРЅРѕ РґР»СЏ РїСЂРѕСЃРјРѕС‚СЂР° СЃ РїРѕРјРѕС‰СЊСЋ СЃРєСЂРёРЅ СЂРёРґРµСЂР°
+            // РџСЂРѕРІРµСЂСЏРµРј, СЃРєРѕР»СЊРєРѕ РІСЃРµРіРѕ Р·Р°РіРѕР»РѕРІРєРѕРІ
             var headers = driver.FindElements(By.XPath("//h1|//h2|//h3|//h4|//h5|//h6"));
             int actualResult = headers.Count;
             Assert.Equal(expectedResult, actualResult);
         }
     }
     [Fact]
-    // Проверка количества элементов авторизации, доступных для просмотра с помощью скрин ридеров
+    // РџСЂРѕРІРµСЂРєР° РєРѕР»РёС‡РµСЃС‚РІР° СЌР»РµРјРµРЅС‚РѕРІ Р°РІС‚РѕСЂРёР·Р°С†РёРё, РґРѕСЃС‚СѓРїРЅС‹С… РґР»СЏ РїСЂРѕСЃРјРѕС‚СЂР° СЃ РїРѕРјРѕС‰СЊСЋ СЃРєСЂРёРЅ СЂРёРґРµСЂРѕРІ
     public void TestCheckQuantityAuthorizationElementsOnThisPage()
     {
         string url = "https://www.saucedemo.com/";
         using (IWebDriver driver = new ChromeDriver())
         {
             driver.Navigate().GoToUrl(url);
-            int expectedResult = 3; // 3 элемента авторизации, доступно для просмотра с помощью скрин ридера
-            // Проверяем, сколько всего элементов авторизации
+            int expectedResult = 3; // 3 СЌР»РµРјРµРЅС‚Р° Р°РІС‚РѕСЂРёР·Р°С†РёРё, РґРѕСЃС‚СѓРїРЅРѕ РґР»СЏ РїСЂРѕСЃРјРѕС‚СЂР° СЃ РїРѕРјРѕС‰СЊСЋ СЃРєСЂРёРЅ СЂРёРґРµСЂР°
+            // РџСЂРѕРІРµСЂСЏРµРј, СЃРєРѕР»СЊРєРѕ РІСЃРµРіРѕ СЌР»РµРјРµРЅС‚РѕРІ Р°РІС‚РѕСЂРёР·Р°С†РёРё
             var inputs = driver.FindElements(By.TagName("input"));
             int actualResult = inputs.Count;
             Assert.Equal(expectedResult, actualResult);
