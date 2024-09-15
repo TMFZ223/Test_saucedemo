@@ -7,6 +7,19 @@ using Xunit;
 
 public class TestSaucedemo
 {
+    private IWebDriver driver;
+    // Создание конструктора класса
+    public TestSaucedemo()
+    {
+        driver = new ChromeDriver();
+        setup();
+    }
+    // Функция, которая будет выполняться перед каждым тестом
+    public void setup()
+    {
+        string url = "https://www.saucedemo.com/";
+        driver.Navigate().GoToUrl(url);
+    }
     // Метод авторизации
     private void authorize(IWebDriver driver)
     {
@@ -81,119 +94,85 @@ public class TestSaucedemo
         var finishButton = wait.Until(ExpectedConditions.ElementToBeClickable(By.XPath("//button[@name='finish']")));
         finishButton.Click();
     }
-        [Fact]
+    [Fact]
     // Тест на авторизацию
     public void TestCheckAuthorization()
     {
-        string url = "https://www.saucedemo.com/";
-
-        using (IWebDriver driver = new ChromeDriver())
-        {
-            driver.Navigate().GoToUrl(url);
-            // Выполняем авторизацию
-            authorize(driver);
-            string expectedResult = "https://www.saucedemo.com/inventory.html"; // Ожидаемый адрес перехода после авторизации
-            var actualResult = driver.Url; // Фактический результат
-            Assert.Equal(expectedResult, actualResult);
-        }
+        // Выполняем авторизацию
+        authorize(driver);
+        string expectedResult = "https://www.saucedemo.com/inventory.html"; // Ожидаемый адрес перехода после авторизации
+        var actualResult = driver.Url; // Фактический результат
+        Assert.Equal(expectedResult, actualResult);
+        driver.Quit();
     }
     [Fact]
     // Тест на добавление товаров в корзину
     public void TestCheckAddProductCart()
     {
-        string url = "https://www.saucedemo.com/";
-
-        using (IWebDriver driver = new ChromeDriver()) // Создание экземпляра Chromedriver
-        {
-
-            driver.Navigate().GoToUrl(url);
-
-            // Выполняем авторизацию
-            authorize(driver);
-            // Осуществляем добавление товара в корзину
-            addProductToCart(driver);
-            string expectedResult = "Sauce Labs Backpack"; // В корзине доступен товар для заказа
-            WebDriverWait wait = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
-            var actualProduct = wait.Until(ExpectedConditions.ElementIsVisible(By.XPath("//div[@class='inventory_item_name']")));
-            string actualResult = actualProduct.Text;
-            Assert.Equal(expectedResult, actualResult);
-        }
+        // Выполняем авторизацию
+        authorize(driver);
+        // Осуществляем добавление товара в корзину
+        addProductToCart(driver);
+        WebDriverWait wait = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
+        var actualProduct = wait.Until(ExpectedConditions.ElementIsVisible(By.XPath("//div[@class='inventory_item_name']")));
+        string expectedResult = "Sauce Labs Backpack"; // В корзине доступен товар для заказа
+        string actualResult = actualProduct.Text;
+        Assert.Equal(expectedResult, actualResult);
+        driver.Quit();
     }
     [Fact]
     // Тест на редактирование заказа
     public void TestCheckEditProductCart()
     {
-        string url = "https://www.saucedemo.com/";
-
-        using (IWebDriver driver = new ChromeDriver()) // Создание экземпляра Chromedriver
-        {
-
-            driver.Navigate().GoToUrl(url);
-
-            // Выполняем авторизацию
-            authorize(driver);
-            // Осуществляем добавление товара в корзину
-            addProductToCart(driver);
-            // Продолжаем покупку
-            continueShopping(driver);
-            string expectedResult = "2"; // В корзине 2 товара
-            WebDriverWait wait = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
-            var actualCart = wait.Until(ExpectedConditions.ElementIsVisible(By.XPath("//span[@class='shopping_cart_badge']")));
-            string actualResult = actualCart.Text;
-            Assert.Equal(expectedResult, actualResult);
-        }
+        // Выполняем авторизацию
+        authorize(driver);
+        // Осуществляем добавление товара в корзину
+        addProductToCart(driver);
+        // Продолжаем покупку
+        continueShopping(driver);
+        WebDriverWait wait = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
+        var actualCart = wait.Until(ExpectedConditions.ElementIsVisible(By.XPath("//span[@class='shopping_cart_badge']")));
+        string expectedResult = "2"; // В корзине 2 товара
+        string actualResult = actualCart.Text;
+        Assert.Equal(expectedResult, actualResult);
+        driver.Quit();
     }
     [Fact]
     // Тест на заказ товара
     public void TestCheckOrderProduct()
     {
-        string url = "https://www.saucedemo.com/";
-
-        using (IWebDriver driver = new ChromeDriver()) // Создание экземпляра Chromedriver
-        {
-
-            driver.Navigate().GoToUrl(url);
-
-            // Выполняем авторизацию
-            authorize(driver);
-            // Выполняем заказ товара
-            doOrder(driver);
-            string expectedResult = "Thank you for your order!";
-            WebDriverWait wait = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
-            var actualHeder = wait.Until(ExpectedConditions.ElementIsVisible(By.XPath("//h2[@class='complete-header']")));
-            string actualResult = actualHeder.Text;
-            Assert.Equal(expectedResult, actualResult);
-        }
+        // Выполняем авторизацию
+        authorize(driver);
+        // Выполняем заказ товара
+        doOrder(driver);
+        WebDriverWait wait = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
+        var actualHeder = wait.Until(ExpectedConditions.ElementIsVisible(By.XPath("//h2[@class='complete-header']")));
+        string expectedResult = "Thank you for your order!";
+        string actualResult = actualHeder.Text;
+        Assert.Equal(expectedResult, actualResult);
+        driver.Quit();
     }
     // Ниже будут приведены тесты на доступность элементов для программ экранного доступа, в качестве образца взята страница авторизации
     [Fact]
     // Проверка количества заголовков, доступных для просмотра с помощью скрин ридеров
     public void TestCheckQuantityHeadersOnThisPage()
     {
-        string url = "https://www.saucedemo.com/";
-        using (IWebDriver driver = new ChromeDriver())
-        {
-            driver.Navigate().GoToUrl(url);
-            int expectedResult = 2; // 2 заголовка, доступно для просмотра с помощью скрин ридера
-            // Проверяем, сколько всего заголовков
-            var headers = driver.FindElements(By.XPath("//h1|//h2|//h3|//h4|//h5|//h6"));
-            int actualResult = headers.Count;
-            Assert.Equal(expectedResult, actualResult);
-        }
+        // Проверяем, сколько всего заголовков
+        var headers = driver.FindElements(By.XPath("//h1|//h2|//h3|//h4|//h5|//h6"));
+        int expectedResult = 2; // 2 заголовка, доступно для просмотра с помощью скрин ридера
+        int actualResult = headers.Count;
+        Assert.Equal(expectedResult, actualResult);
+        driver.Quit();
     }
     [Fact]
     // Проверка количества элементов авторизации, доступных для просмотра с помощью скрин ридеров
     public void TestCheckQuantityAuthorizationElementsOnThisPage()
     {
-        string url = "https://www.saucedemo.com/";
-        using (IWebDriver driver = new ChromeDriver())
-        {
-            driver.Navigate().GoToUrl(url);
-            int expectedResult = 3; // 3 элемента авторизации, доступно для просмотра с помощью скрин ридера
-            // Проверяем, сколько всего элементов авторизации
-            var inputs = driver.FindElements(By.TagName("input"));
-            int actualResult = inputs.Count;
-            Assert.Equal(expectedResult, actualResult);
-        }
+        // Проверяем, сколько всего элементов авторизации
+        var inputs = driver.FindElements(By.TagName("input"));
+        int expectedResult = 3; // 3 элемента авторизации, доступно для просмотра с помощью скрин ридера
+        int actualResult = inputs.Count;
+        Assert.Equal(expectedResult, actualResult);
+        driver.Quit();
     }
 }
